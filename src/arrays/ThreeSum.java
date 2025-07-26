@@ -1,0 +1,116 @@
+package arrays;
+
+import java.util.*;
+
+/*Given an integer array nums, return all the triplets [nums[i], nums[j], nums[k]] such that i != j, i != k, and j != k, and nums[i] + nums[j] + nums[k] == 0.
+
+Notice that the solution set must not contain duplicate triplets.
+
+
+
+Example 1:
+
+Input: nums = [-1,0,1,2,-1,-4]
+Output: [[-1,-1,2],[-1,0,1]]
+Explanation:
+nums[0] + nums[1] + nums[2] = (-1) + 0 + 1 = 0.
+nums[1] + nums[2] + nums[4] = 0 + 1 + (-1) = 0.
+nums[0] + nums[3] + nums[4] = (-1) + 2 + (-1) = 0.
+The distinct triplets are [-1,0,1] and [-1,-1,2].
+Notice that the order of the output and the order of the triplets does not matter.
+Example 2:
+
+Input: nums = [0,1,1]
+Output: []
+Explanation: The only possible triplet does not sum up to 0.
+Example 3:
+
+Input: nums = [0,0,0]
+Output: [[0,0,0]]
+Explanation: The only possible triplet sums up to 0.*/
+
+public class ThreeSum {
+    //bruteforce solution o(n3) time
+    public static List<List<Integer>> bruteforceThreesome(int[] arr){
+        List<List<Integer>> resultlist=new ArrayList<>();
+        for(int i=0;i<arr.length;i++){
+            for(int j=i+1;j<arr.length;j++){
+                for(int k=j+1;k<arr.length;k++){
+                    if(arr[i]+arr[j]+arr[k]==0){
+                        ArrayList<Integer> list=new ArrayList();
+                        list.add(arr[i]);
+                        list.add(arr[j]);
+                        list.add(arr[k]);
+                        Collections.sort(list);
+                        if(!resultlist.contains(list))
+                            resultlist.add(list);
+                    }
+                }
+            }
+        }
+        return resultlist;
+    }
+
+    //better solution with o(n2)
+    public static List<List<Integer>> betterThreesome(int[] arr){
+        List<List<Integer>> resultlist=new ArrayList<>();
+        for(int i=0;i<arr.length;i++){
+            Set hm=new HashSet();
+            for(int j=i+i;j<arr.length;j++){
+                int third=-(arr[i]+arr[j]);
+                if(hm.contains(third)){
+                    ArrayList<Integer> list=new ArrayList();
+                    list.add(arr[i]);
+                    list.add(arr[j]);
+                    list.add(third);
+                    Collections.sort(list);
+                    if(!resultlist.contains(list))
+                        resultlist.add(list);
+                }
+                hm.add(arr[j]);
+            }
+        }
+        return resultlist;
+    }
+
+    //optimal Solution witn o(nlogn) time
+    public static List<List<Integer>> optimalThreesome(int[] arr){
+        List<List<Integer>> resultlist=new ArrayList<>();
+        Arrays.sort(arr);
+        for(int i=0;i<arr.length;i++){
+            if(i>0 && arr[i]==arr[i]-1) continue;
+            int j=i+1;
+            int k=arr.length-1;
+            while(j<k){
+                int sum=arr[i]+arr[j]+arr[k];
+                if(sum<0){
+                    j++;
+                }
+                else if(sum>0){
+                    k--;
+                }
+                else{
+                    ArrayList<Integer> list = new ArrayList();
+                    list.add(arr[i]);
+                    list.add(arr[j]);
+                    list.add(arr[k]);
+                    Collections.sort(list);
+                    if (!resultlist.contains(list))
+                        resultlist.add(list);
+                    j++;
+                    k--;
+                    while(j<k && arr[j]==arr[j+1]) j++;
+                    while(j<k && arr[k]==arr[k-1]) k--;
+                }
+            }
+        }
+        return resultlist;
+    }
+
+    public static void main(String args[]){
+        int[] arr={-1,0,1,2,-1,-4};
+        Arrays.stream(bruteforceThreesome(arr).toArray()).forEach(System.out::println); // Brute force
+        Arrays.stream(betterThreesome(arr).toArray()).forEach(System.out::println); //better approach
+        Arrays.stream(optimalThreesome(arr).toArray()).forEach(System.out::println); // optimal solution Two pointers
+    }
+}
